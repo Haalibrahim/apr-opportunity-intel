@@ -31,7 +31,8 @@ REPORTS_DIR.mkdir(exist_ok=True)
 
 TODAY = date.today().isoformat()
 TODAY_PRETTY = datetime.now().strftime("%B %d, %Y")
-MODEL = "claude-haiku-4-5-20251001"
+MODEL = "claude-sonnet-4-6"
+DEBUG = True  # Print raw model output for troubleshooting
 
 
 # ─── Data Loading ─────────────────────────────────────────────────────────────
@@ -100,7 +101,7 @@ def scan_wave(client, wave):
             break  # Success — exit retry loop
         except Exception as e:
             if "rate_limit" in str(e) or "429" in str(e):
-                wait = 90 * (attempt + 1)
+                wait = 120 * (attempt + 1)
                 print(f"    Rate limited — waiting {wait}s before retry ({attempt+1}/3)...")
                 time.sleep(wait)
                 if attempt == 2:
@@ -120,13 +121,22 @@ def scan_wave(client, wave):
 
         full_text = "\n".join(text_parts)
 
+        # Debug: show what the model returned
+        if DEBUG:
+            print(f"    [DEBUG] Response length: {len(full_text)} chars")
+            print(f"    [DEBUG] First 300 chars: {full_text[:300]}")
+
         # Parse JSON
         match = re.search(r"\[[\s\S]*\]", full_text)
         if not match:
             print(f"    No structured results found")
+            if DEBUG:
+                print(f"    [DEBUG] Full response: {full_text[:500]}")
             return []
 
         items = json.loads(match.group(0))
+        if DEBUG:
+            print(f"    [DEBUG] Parsed {len(items)} items from JSON")
 
         # Filter past deadlines
         valid = []
@@ -208,7 +218,7 @@ JSON ARRAY ONLY. No markdown."""
             break
         except Exception as e:
             if "rate_limit" in str(e) or "429" in str(e):
-                wait = 90 * (attempt + 1)
+                wait = 120 * (attempt + 1)
                 print(f"    Rate limited — waiting {wait}s ({attempt+1}/3)...")
                 time.sleep(wait)
                 if attempt == 2:
@@ -488,8 +498,8 @@ def run_scan(wave_filter=None, org_filter=None):
         all_opportunities.extend(results)
         # Wait between waves to respect rate limits (30K tokens/min)
         if i < len(waves) - 1:
-            print(f"    Waiting 120s before next wave (rate limit cooldown)...")
-            time.sleep(120)
+            print(f"    Waiting 180s before next wave (rate limit cooldown)...")
+            time.sleep(180)
 
     # Deduplicate by RFP number
     seen = set()
@@ -508,8 +518,8 @@ def run_scan(wave_filter=None, org_filter=None):
         return
 
     # Phase 2: Match to each org (with prompt caching)
-    print(f"\n  Waiting 120s before org matching (rate limit cooldown)...")
-    time.sleep(120)
+    print(f"\n  Waiting 180s before org matching (rate limit cooldown)...")
+    time.sleep(180)
     print(f"\n[Phase 2] Matching to {len(orgs)} organization(s)...")
     for org in orgs:
         matched = match_opportunities_to_org(client, all_opportunities.copy(), org)

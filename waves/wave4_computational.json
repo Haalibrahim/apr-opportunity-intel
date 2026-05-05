@@ -1,0 +1,102 @@
+{
+  "id": "wave4_computational",
+  "name": "Computational & Systems Analysis",
+  "version": "1.0",
+  "owner": "Raff",
+  "color": "#7F77DD",
+  "description": "Agent-based modeling, mathematical simulation, machine learning, network analysis, optimization, and statistical inference applied to policy problems. Distinguished by integration with qualitative insights and stakeholder input.",
+
+  "scope": {
+    "included": [
+      "Epidemiological modeling (deterministic + stochastic)",
+      "Economic and labor supply simulation models",
+      "Health system and workforce demand modeling",
+      "Cybersecurity games and interdependent network models",
+      "Network diffusion and contagion processes (policy-relevant)",
+      "LLMs applied to social systems and behavioral simulation",
+      "Optimization of policy and intervention strategies",
+      "Decision intelligence and reinforcement learning for policy",
+      "Statistical inference with simulation components",
+      "Causal inference integrated with computational models",
+      "Physics-inspired complex systems (when policy-relevant)"
+    ],
+    "excluded": [
+      "Pure within-host biological models with no policy relevance",
+      "Pure theoretical physics without transferability to policy",
+      "Pure network science without explicit policy application",
+      "Non-policy simulation ecosystems with no intervention layer"
+    ]
+  },
+
+  "ranking_rules": {
+    "primary_filter": {
+      "name": "Simulation vs Policy Balance",
+      "optimal": "70% simulation / 30% policy framing",
+      "minimum": ">=50% simulation content for high priority",
+      "exclude_below": "<25% policy relevance OR purely theoretical"
+    },
+    "funding_preference": {
+      "high_priority": "$500K–$1M",
+      "lower_priority": "<$500K unless strategic",
+      "deprioritized": ">$1M unless strongly aligned and feasible"
+    },
+    "interdisciplinarity": {
+      "preferred": "2–3 tightly coupled disciplines (e.g. math + epidemiology + policy)",
+      "avoid": "Overly diffuse multi-field consortia without clear computational core",
+      "exclude": "Broad humanities-heavy without modeling core"
+    }
+  },
+
+  "sources": [
+    {"name": "NSF SBE/SES", "type": "Federal", "url": "nsf.gov/funding", "search_for": "Computational social science, AI for policy, network science"},
+    {"name": "NSF CISE/IIS", "type": "Federal", "url": "nsf.gov/funding", "search_for": "AI systems, data science, computational methods"},
+    {"name": "NSF CMMI", "type": "Federal", "url": "nsf.gov/funding", "search_for": "Systems engineering, optimization, simulation"},
+    {"name": "NSF OAC", "type": "Federal", "url": "nsf.gov/funding", "search_for": "Cyberinfrastructure, HPC, computational tools"},
+    {"name": "NSF Convergence Accelerator", "type": "Federal", "url": "nsf.gov/od/oia/convergence-accelerator", "search_for": "Cross-discipline convergence research"},
+    {"name": "DOE Office of Science", "type": "Federal", "url": "science.osti.gov", "search_for": "Computational science, simulation, HPC, modeling"},
+    {"name": "NIH (multi-institute)", "type": "Federal", "url": "nih.gov", "search_for": "Epidemiological modeling, microsimulation, health systems simulation"},
+    {"name": "NIH ODSS", "type": "Federal", "url": "datascience.nih.gov", "search_for": "AI/ML infrastructure, federated data, biomedical simulation"},
+    {"name": "NIAID ODSET", "type": "Federal", "url": "niaid.nih.gov", "search_for": "Infectious disease modeling, outbreak simulation, AI preparedness"},
+    {"name": "IARPA", "type": "Federal", "url": "iarpa.gov", "search_for": "Intelligence analytics, network modeling, AI systems"},
+    {"name": "ARPA-H", "type": "Federal", "url": "arpa-h.gov", "search_for": "Health systems modeling, digital twins, health AI"},
+    {"name": "DARPA", "type": "Federal", "url": "darpa.mil", "search_for": "Complex systems, simulation, decision science, AI"},
+    {"name": "ASPE (HHS)", "type": "Federal", "url": "aspe.hhs.gov", "search_for": "Health policy modeling, microsimulation, evaluation"},
+    {"name": "Gates Foundation", "type": "Foundation", "url": "gatesfoundation.org", "search_for": "Infectious disease modeling, global health simulation"},
+    {"name": "Schmidt Sciences", "type": "Foundation", "url": "schmidtsciences.org", "search_for": "AI for science, computational modeling"},
+    {"name": "RWJF", "type": "Foundation", "url": "rwjf.org", "search_for": "Health systems modeling, social determinants simulation"},
+    {"name": "Sloan Foundation", "type": "Foundation", "url": "sloan.org", "search_for": "Data science, computational economics, complex systems"},
+    {"name": "Alan Turing Institute", "type": "International", "url": "turing.ac.uk", "search_for": "Data science collaborations, computational social science"},
+    {"name": "NOAA Climate Program Office", "type": "Federal", "url": "noaa.gov", "search_for": "Climate modeling, environmental systems simulation"},
+    {"name": "NASA Earth Sciences", "type": "Federal", "url": "science.nasa.gov", "search_for": "Earth system modeling, climate-policy simulations"}
+  ],
+
+  "optional_sources": [
+    {"name": "NeurIPS Workshops", "url": "neurips.cc", "search_for": "ML for social systems, causal ML"},
+    {"name": "ICML Workshops", "url": "icml.cc", "search_for": "ML + decision systems"},
+    {"name": "AAAI Workshops", "url": "aaai.org", "search_for": "AI for social good, planning"},
+    {"name": "IC2S2", "url": "ic2s2.org", "search_for": "Computational social science calls"},
+    {"name": "Microsoft Research", "url": "microsoft.com/research", "search_for": "Health modeling, AI systems (select calls)"},
+    {"name": "Google Research", "url": "research.google", "search_for": "ML for societal systems (select calls)"},
+    {"name": "Santa Fe Institute", "url": "santafe.edu", "search_for": "Complexity science, networks, emergent systems"},
+    {"name": "Complex Systems Society", "url": "complexsystemssociety.org", "search_for": "Agent-based modeling, statistical physics for society"}
+  ],
+
+  "arpa_detection": {
+    "enabled": true,
+    "watch": ["DARPA BAAs", "IARPA solicitations", "ARPA-H calls"],
+    "description": "Lightweight module that flags rapid-cycle, high-risk/high-reward computational systems calls"
+  },
+
+  "search_queries": [
+    "NSF computational social science grant 2026",
+    "NSF HNDS human networks data science deadline",
+    "NSF agent-based modeling simulation grant",
+    "DOE Office of Science computational research open",
+    "DARPA BAA AI systems 2026 open",
+    "IARPA research program solicitation 2026",
+    "ARPA-H digital twin health modeling",
+    "NIH computational epidemiology modeling grant",
+    "Sloan Foundation data science grant open",
+    "Schmidt Sciences AI for science call"
+  ]
+}

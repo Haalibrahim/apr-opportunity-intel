@@ -1,0 +1,83 @@
+{
+  "id": "wave1_health",
+  "name": "Health Systems & Policy",
+  "version": "1.0",
+  "owner": "Hamad",
+  "color": "#1D9E75",
+  "description": "Health policy analysis, implementation science, epidemiology, health services delivery, vaccination uptake, chronic disease management, healthcare delivery transformation, pandemic preparedness, and quality improvement. APR brings mixed-methods, stakeholder-centered design, and computational modeling to health policy.",
+
+  "scope": {
+    "included": [
+      "Health services delivery research and optimization",
+      "Health policy analysis and evaluation",
+      "Implementation science and dissemination research",
+      "Epidemiology and population health",
+      "Vaccination policy and uptake modeling",
+      "Chronic disease management interventions",
+      "Healthcare workforce and delivery transformation",
+      "Pandemic preparedness and health security",
+      "Quality improvement and patient safety",
+      "Health equity and disparities research",
+      "Digital health and health information technology",
+      "Health economics and cost-effectiveness analysis",
+      "Comparative effectiveness research",
+      "Evidence synthesis and systematic reviews"
+    ],
+    "excluded": [
+      "Pure bench science / wet lab research",
+      "Drug discovery and pharmaceutical development",
+      "Device engineering without policy/delivery component",
+      "Pure clinical trials without health services framing",
+      "Animal studies without human population relevance"
+    ]
+  },
+
+  "ranking_rules": {
+    "primary_filter": {
+      "name": "Policy Translation",
+      "optimal": "Research with direct policy or practice implications",
+      "minimum": "Clear pathway from findings to actionable recommendations",
+      "exclude_below": "Basic science without stated policy relevance"
+    },
+    "funding_preference": {
+      "high_priority": "$250K–$750K (R01 range, foundation grants)",
+      "also_pursue": "$50K–$250K (R21, pilot grants, foundation seeds)",
+      "deprioritized": ">$2M unless APR has strong PI partnership"
+    },
+    "eligibility_filter": {
+      "flag": "Grants requiring 501(c)(3) — APR needs fiscal sponsor or academic partner",
+      "prioritize": "Grants open to for-profit research organizations or with subcontractor path",
+      "note": "Most NIH grants require academic PI — APR as co-I or subcontractor"
+    }
+  },
+
+  "sources": [
+    {"name": "NIH (NIAID, NICHD, NCI, NHLBI, NIMHD, NIA, AHRQ)", "type": "Federal", "url": "grants.gov", "search_for": "Health services research, health policy, implementation science, epidemiology"},
+    {"name": "NIH Parent R01 (PA-25-301, PA-25-303, PA-25-305)", "type": "Federal", "url": "grants.nih.gov/funding/explore-nih-opportunities/parent-announcements", "search_for": "Investigator-initiated health research"},
+    {"name": "AHRQ", "type": "Federal", "url": "ahrq.gov/funding", "search_for": "Healthcare quality, effectiveness, accessibility, cost-effectiveness"},
+    {"name": "CDC Grants & Cooperative Agreements", "type": "Federal", "url": "grants.gov", "search_for": "Public health, disease prevention, surveillance, preparedness"},
+    {"name": "HRSA", "type": "Federal", "url": "grants.gov", "search_for": "Health workforce, underserved populations, health centers, maternal health"},
+    {"name": "SAMHSA", "type": "Federal", "url": "samhsa.gov/grants", "search_for": "Mental health, substance use, community resilience, prevention"},
+    {"name": "PCORI", "type": "Quasi-govt", "url": "pcori.org", "search_for": "Comparative effectiveness, patient-centered outcomes, stakeholder engagement"},
+    {"name": "RWJF", "type": "Foundation", "url": "rwjf.org/en/grants/active-funding-opportunities.html", "search_for": "Health equity, evidence for action, systems change, policy research"},
+    {"name": "Commonwealth Fund", "type": "Foundation", "url": "commonwealthfund.org", "search_for": "Health system performance, insurance coverage, primary care"},
+    {"name": "Gates Foundation", "type": "Foundation", "url": "gatesfoundation.org", "search_for": "Global health, health systems strengthening, health equity"},
+    {"name": "AcademyHealth ARM", "type": "Conference", "url": "academyhealth.org", "search_for": "Call for abstracts, health services research presentations"},
+    {"name": "APHA Annual Meeting", "type": "Conference", "url": "apha.org", "search_for": "Public health conference abstract submissions"},
+    {"name": "WHO", "type": "International", "url": "who.int", "search_for": "Health policy consultancies, health systems research calls"},
+    {"name": "PAHO", "type": "International", "url": "paho.org", "search_for": "Americas health systems, health policy calls"}
+  ],
+
+  "search_queries": [
+    "NIH health services research grant 2026 open",
+    "AHRQ funding opportunity 2026 deadline",
+    "RWJF call for proposals health equity 2026",
+    "PCORI funding cycle 2026 comparative effectiveness",
+    "CDC cooperative agreement public health 2026",
+    "HRSA grant 2026 health workforce open",
+    "SAMHSA NOFO forecast 2026",
+    "Commonwealth Fund grant health system 2026",
+    "WHO call for proposals health systems 2026",
+    "AcademyHealth call for abstracts 2027"
+  ]
+}

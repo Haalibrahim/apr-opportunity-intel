@@ -31,7 +31,7 @@ REPORTS_DIR.mkdir(exist_ok=True)
 
 TODAY = date.today().isoformat()
 TODAY_PRETTY = datetime.now().strftime("%B %d, %Y")
-MODEL = "claude-sonnet-4-6"
+MODEL = "claude-haiku-4-5-20251001"
 
 
 # ─── Data Loading ─────────────────────────────────────────────────────────────
@@ -100,7 +100,7 @@ def scan_wave(client, wave):
             break  # Success — exit retry loop
         except Exception as e:
             if "rate_limit" in str(e) or "429" in str(e):
-                wait = 60 * (attempt + 1)
+                wait = 90 * (attempt + 1)
                 print(f"    Rate limited — waiting {wait}s before retry ({attempt+1}/3)...")
                 time.sleep(wait)
                 if attempt == 2:
@@ -208,7 +208,7 @@ JSON ARRAY ONLY. No markdown."""
             break
         except Exception as e:
             if "rate_limit" in str(e) or "429" in str(e):
-                wait = 60 * (attempt + 1)
+                wait = 90 * (attempt + 1)
                 print(f"    Rate limited — waiting {wait}s ({attempt+1}/3)...")
                 time.sleep(wait)
                 if attempt == 2:
@@ -488,8 +488,8 @@ def run_scan(wave_filter=None, org_filter=None):
         all_opportunities.extend(results)
         # Wait between waves to respect rate limits (30K tokens/min)
         if i < len(waves) - 1:
-            print(f"    Waiting 65s before next wave (rate limit cooldown)...")
-            time.sleep(65)
+            print(f"    Waiting 120s before next wave (rate limit cooldown)...")
+            time.sleep(120)
 
     # Deduplicate by RFP number
     seen = set()
@@ -508,8 +508,8 @@ def run_scan(wave_filter=None, org_filter=None):
         return
 
     # Phase 2: Match to each org (with prompt caching)
-    print(f"\n  Waiting 65s before org matching (rate limit cooldown)...")
-    time.sleep(65)
+    print(f"\n  Waiting 120s before org matching (rate limit cooldown)...")
+    time.sleep(120)
     print(f"\n[Phase 2] Matching to {len(orgs)} organization(s)...")
     for org in orgs:
         matched = match_opportunities_to_org(client, all_opportunities.copy(), org)

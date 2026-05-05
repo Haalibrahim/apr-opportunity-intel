@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+
+# Reports (generated, not tracked)
+reports/*.html
+reports/*.xlsx
+reports/*.json
+!reports/.gitkeep
+
+# Environment & secrets
+.env
+.env.local
+*.pem
+*.key
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Replit
+.replit
+replit.nix
+.cache/
+.config/
+
+# Node (if frontend added later)
+node_modules/
+package-lock.json

@@ -2,7 +2,7 @@
   "id": "apr",
   "name": "Alliance for Policy Research",
   "short": "APR",
-  "type": "For-profit LLC (US-based, Massachusetts)",
+  "type": "Dual entity: 501(c)(3) nonprofit (APR) + For-profit LLC (Policy Tech Innovations LLC, Massachusetts)",
   "website": "allianceforpolicyresearch.org",
 
   "strengths": [
@@ -27,13 +27,14 @@
   },
 
   "eligibility_constraints": {
-    "entity_type": "For-profit LLC",
-    "nih_eligible": "As subcontractor or co-investigator only — needs academic PI partner",
-    "nsf_eligible": "Limited — most NSF grants require academic institution as lead",
-    "darpa_eligible": "Yes — DARPA BAAs open to all responsible sources including LLCs",
-    "foundation_eligible": "Varies — many require 501(c)(3); may need fiscal sponsor",
-    "federal_contracts": "Eligible via SAM.gov registration",
-    "international": "Can partner on Horizon Europe, WHO, World Bank as US entity"
+    "entity_type": "501(c)(3) nonprofit + For-profit LLC (dual structure)",
+    "nih_eligible": "Yes — eligible as lead applicant organization through 501(c)(3); LLC available for contracts",
+    "nsf_eligible": "Yes — eligible through nonprofit entity; academic PI partnership still strengthens proposals",
+    "darpa_eligible": "Yes — DARPA BAAs open to all responsible sources (either entity)",
+    "foundation_eligible": "Yes — 501(c)(3) status qualifies for RWJF, Gates, Ford, MacArthur, Hewlett, and most foundations",
+    "federal_contracts": "Eligible via SAM.gov registration (LLC entity for contracts)",
+    "international": "Can partner on Horizon Europe, WHO, World Bank; 501(c)(3) strengthens eligibility",
+    "note": "Use NGO for grants and foundation funding; use LLC for consulting contracts and commercial work"
   },
 
   "preferred_funding_range": {

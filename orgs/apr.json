@@ -1,0 +1,71 @@
+{
+  "id": "apr",
+  "name": "Alliance for Policy Research",
+  "short": "APR",
+  "type": "For-profit LLC (US-based, Massachusetts)",
+  "website": "allianceforpolicyresearch.org",
+
+  "strengths": [
+    "Mixed-methods research design",
+    "Computational modeling (agent-based, simulation, ML, network analysis)",
+    "Stakeholder-centered design and engagement",
+    "Health policy analysis and evaluation",
+    "Emergency management and disaster preparedness",
+    "Defense policy and national security analytics",
+    "Implementation science",
+    "Evidence synthesis and systematic reviews",
+    "Survey design and analysis",
+    "Decision-support tool development",
+    "LLM/NLP pipeline development for research",
+    "Grant screening and classification systems"
+  ],
+
+  "team_expertise": {
+    "pi_level": ["Health policy (MD/PhD)", "Computational modeling (PhD)", "Emergency management"],
+    "methods": ["Agent-based modeling", "Markov chains", "Game theory", "NLP/LLM pipelines", "Mixed methods", "Causal inference"],
+    "domains": ["Health systems", "Defense", "Emergency management", "Gulf geopolitics", "AI governance"]
+  },
+
+  "eligibility_constraints": {
+    "entity_type": "For-profit LLC",
+    "nih_eligible": "As subcontractor or co-investigator only — needs academic PI partner",
+    "nsf_eligible": "Limited — most NSF grants require academic institution as lead",
+    "darpa_eligible": "Yes — DARPA BAAs open to all responsible sources including LLCs",
+    "foundation_eligible": "Varies — many require 501(c)(3); may need fiscal sponsor",
+    "federal_contracts": "Eligible via SAM.gov registration",
+    "international": "Can partner on Horizon Europe, WHO, World Bank as US entity"
+  },
+
+  "preferred_funding_range": {
+    "sweet_spot": "$250K–$1M",
+    "will_pursue": "$50K–$250K if strategic",
+    "needs_consortium": ">$1M"
+  },
+
+  "partnership_network": [
+    "Chloe Bird (Tufts Medical Center) — cardiovascular, women's health",
+    "Prof. Arokiasamy Perianayagam — survey research, Qatar",
+    "Prof. Giridhara Babu — MCSC, charitable sector screening",
+    "SESRI (Qatar University) — survey infrastructure",
+    "Doha Institute for Graduate Studies — academic affiliation"
+  ],
+
+  "competitors": [
+    "RAND Corporation",
+    "Mathematica",
+    "Abt Associates",
+    "NORC at University of Chicago",
+    "RTI International",
+    "Urban Institute",
+    "Brookings Institution"
+  ],
+
+  "report_preferences": {
+    "format": ["HTML (printable to PDF)", "Excel tracker", "ICS calendar"],
+    "frequency": "Weekly (Monday morning)",
+    "delivery": "Email + shared drive",
+    "include_stretch": true,
+    "include_what_you_need": true,
+    "flag_eligibility_issues": true
+  }
+}

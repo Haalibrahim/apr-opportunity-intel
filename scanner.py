@@ -94,7 +94,7 @@ def scan_wave(client, wave):
         try:
             response = client.messages.create(
                 model=MODEL,
-                max_tokens=2500,
+                max_tokens=4096,
                 tools=[{"type": "web_search_20250305", "name": "web_search"}],
                 messages=[{"role": "user", "content": prompt}],
             )
@@ -126,15 +126,36 @@ def scan_wave(client, wave):
             print(f"    [DEBUG] Response length: {len(full_text)} chars")
             print(f"    [DEBUG] First 300 chars: {full_text[:300]}")
 
-        # Parse JSON
+        # Parse JSON — handle preamble text and possibly truncated output
         match = re.search(r"\[[\s\S]*\]", full_text)
         if not match:
-            print(f"    No structured results found")
-            if DEBUG:
-                print(f"    [DEBUG] Full response: {full_text[:500]}")
-            return []
-
-        items = json.loads(match.group(0))
+            # Try to find a truncated array (starts with [ but no closing ])
+            trunc_match = re.search(r"\[[\s\S]*", full_text)
+            if trunc_match:
+                raw = trunc_match.group(0).rstrip()
+                # Find the last complete JSON object (ends with })
+                last_brace = raw.rfind("}")
+                if last_brace > 0:
+                    raw = raw[:last_brace + 1] + "]"
+                    if DEBUG:
+                        print(f"    [DEBUG] Repaired truncated JSON ({len(raw)} chars)")
+                    try:
+                        items = json.loads(raw)
+                    except json.JSONDecodeError:
+                        print(f"    Could not parse repaired JSON")
+                        if DEBUG:
+                            print(f"    [DEBUG] Repaired text start: {raw[:200]}")
+                        return []
+                else:
+                    print(f"    No structured results found")
+                    return []
+            else:
+                print(f"    No structured results found")
+                if DEBUG:
+                    print(f"    [DEBUG] Full response: {full_text[:500]}")
+                return []
+        else:
+            items = json.loads(match.group(0))
         if DEBUG:
             print(f"    [DEBUG] Parsed {len(items)} items from JSON")
 
@@ -195,7 +216,7 @@ def match_opportunities_to_org(client, opportunities, org):
         try:
             response = client.messages.create(
                 model=MODEL,
-                max_tokens=2500,
+                max_tokens=4096,
                 system=[
                     {
                         "type": "text",
@@ -498,8 +519,8 @@ def run_scan(wave_filter=None, org_filter=None):
         all_opportunities.extend(results)
         # Wait between waves to respect rate limits (30K tokens/min)
         if i < len(waves) - 1:
-            print(f"    Waiting 180s before next wave (rate limit cooldown)...")
-            time.sleep(180)
+            print(f"    Waiting 300s (5 min) before next wave (rate limit cooldown)...")
+            time.sleep(300)
 
     # Deduplicate by RFP number
     seen = set()
@@ -518,8 +539,8 @@ def run_scan(wave_filter=None, org_filter=None):
         return
 
     # Phase 2: Match to each org (with prompt caching)
-    print(f"\n  Waiting 180s before org matching (rate limit cooldown)...")
-    time.sleep(180)
+    print(f"\n  Waiting 300s (5 min) before org matching (rate limit cooldown)...")
+    time.sleep(300)
     print(f"\n[Phase 2] Matching to {len(orgs)} organization(s)...")
     for org in orgs:
         matched = match_opportunities_to_org(client, all_opportunities.copy(), org)

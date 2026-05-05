@@ -15,6 +15,7 @@ import json
 import re
 import sys
 import glob
+import time
 from datetime import datetime, date
 from pathlib import Path
 
@@ -30,7 +31,7 @@ REPORTS_DIR.mkdir(exist_ok=True)
 
 TODAY = date.today().isoformat()
 TODAY_PRETTY = datetime.now().strftime("%B %d, %Y")
-MODEL = "claude-sonnet-4-20250514"
+MODEL = "claude-sonnet-4-6"
 
 
 # ─── Data Loading ─────────────────────────────────────────────────────────────
@@ -62,73 +63,54 @@ def load_orgs(org_filter=None):
 # ─── Wave Scanner ─────────────────────────────────────────────────────────────
 
 def build_wave_prompt(wave):
-    """Build a focused search prompt from a wave config."""
+    """Build a SHORT, focused search prompt from a wave config."""
 
-    sources_text = "\n".join(
-        f"  - {s['name']} ({s['type']}): {s['search_for']}"
-        for s in wave["sources"]
-    )
+    # Only include top 6 sources to keep prompt short (rate limit friendly)
+    top_sources = wave["sources"][:6]
+    sources_text = ", ".join(s["name"] for s in top_sources)
 
-    scope_included = "\n".join(f"  - {s}" for s in wave["scope"]["included"])
-    scope_excluded = "\n".join(f"  - {s}" for s in wave["scope"]["excluded"])
+    return f"""Search for SPECIFIC open grants, RFPs, and calls related to: {wave['name']}.
 
-    ranking = wave.get("ranking_rules", {})
-    ranking_text = ""
-    for key, rules in ranking.items():
-        if isinstance(rules, dict):
-            ranking_text += f"\n{key}:\n"
-            for rk, rv in rules.items():
-                ranking_text += f"  {rk}: {rv}\n"
+TODAY: {TODAY}. Only deadlines AFTER today. Include Rolling/Upcoming.
 
-    return f"""You are an opportunity scanner for a policy research organization.
+Focus: {wave['description'][:200]}
 
-TODAY: {TODAY}. Only include opportunities with deadlines AFTER {TODAY} or marked as Rolling/Continuous/Upcoming.
+Key sources: {sources_text}
 
-WAVE: {wave['name']}
-DESCRIPTION: {wave['description']}
+For each, provide JSON with: rfp_number, title, category (Grant/RFP/Contract/Abstract), requester, funding, deadline (YYYY-MM-DD or Rolling), submission_type (Full proposal/LOI then full/Two-stage/White paper then full), summary (2 sentences), source (direct URL), eligibility.
 
-SCOPE — INCLUDE:
-{scope_included}
-
-SCOPE — EXCLUDE:
-{scope_excluded}
-
-RANKING RULES:
-{ranking_text}
-
-SOURCES TO SEARCH:
-{sources_text}
-
-Search for SPECIFIC, NAMED opportunities. Each must have:
-- rfp_number: The exact NOFO/RFP/BAA/PA number (e.g. PA-25-301, HR001126S0001, NSF 25-527)
-- title: Exact name of the opportunity
-- category: One of Grant, RFP, Contract, Abstract
-- requester: Funding organization
-- funding: Dollar amount if stated, otherwise "Not specified"
-- deadline: YYYY-MM-DD or "Rolling" or "Upcoming"
-- submission_type: "Full proposal" or "LOI then full proposal" or "Abstract then full proposal" or "Two-stage: preliminary then full" or "White paper then full proposal"
-- summary: 2-3 sentences about what is sought
-- source: Direct URL to the specific solicitation page
-- eligibility: Who can apply (flag if 501(c)(3) only or academic-only)
-
-RESPOND WITH ONLY A JSON ARRAY. No markdown. No backticks. No explanation.
-If nothing found: []"""
+JSON ARRAY ONLY. No markdown. No backticks. []  if nothing."""
 
 
 def scan_wave(client, wave):
     """Run a single wave scan using Anthropic API with web search."""
     print(f"  Scanning: {wave['name']} ({len(wave['sources'])} sources)...")
 
-    # Use the wave's search queries if defined, otherwise build from prompt
     prompt = build_wave_prompt(wave)
 
+    # Retry up to 3 times with increasing delay for rate limits
+    for attempt in range(3):
+        try:
+            response = client.messages.create(
+                model=MODEL,
+                max_tokens=2500,
+                tools=[{"type": "web_search_20250305", "name": "web_search"}],
+                messages=[{"role": "user", "content": prompt}],
+            )
+            break  # Success — exit retry loop
+        except Exception as e:
+            if "rate_limit" in str(e) or "429" in str(e):
+                wait = 60 * (attempt + 1)
+                print(f"    Rate limited — waiting {wait}s before retry ({attempt+1}/3)...")
+                time.sleep(wait)
+                if attempt == 2:
+                    print(f"    Failed after 3 retries")
+                    return []
+            else:
+                print(f"    Error: {e}")
+                return []
+
     try:
-        response = client.messages.create(
-            model=MODEL,
-            max_tokens=4000,
-            tools=[{"type": "web_search_20250305", "name": "web_search"}],
-            messages=[{"role": "user", "content": prompt}],
-        )
 
         # Extract text from response
         text_parts = []
@@ -191,71 +173,52 @@ def match_opportunities_to_org(client, opportunities, org):
 
     print(f"  Matching {len(opportunities)} opportunities to {org['short']}...")
 
-    # Build the cached context with all opportunities
-    opps_json = json.dumps(opportunities, indent=2)
+    # Compact the opportunities JSON to save tokens
+    opps_compact = json.dumps([{
+        "rfp_number": o.get("rfp_number",""), "title": o.get("title",""),
+        "category": o.get("category",""), "requester": o.get("requester",""),
+        "funding": o.get("funding",""), "deadline": o.get("deadline",""),
+        "eligibility": o.get("eligibility",""), "summary": o.get("summary","")[:100]
+    } for o in opportunities])
 
-    # Build org profile text
-    org_text = f"""
-Organization: {org['name']} ({org['short']})
-Type: {org['type']}
-Strengths: {', '.join(org['strengths'])}
-"""
-    if "eligibility_constraints" in org:
-        ec = org["eligibility_constraints"]
-        org_text += f"""
-Eligibility:
-  NIH: {ec.get('nih_eligible', 'Unknown')}
-  NSF: {ec.get('nsf_eligible', 'Unknown')}
-  DARPA: {ec.get('darpa_eligible', 'Unknown')}
-  Foundation: {ec.get('foundation_eligible', 'Unknown')}
-"""
-    if "preferred_funding_range" in org:
-        pf = org["preferred_funding_range"]
-        org_text += f"  Preferred funding: {pf.get('sweet_spot', 'Not specified')}\n"
+    for attempt in range(3):
+        try:
+            response = client.messages.create(
+                model=MODEL,
+                max_tokens=2500,
+                system=[
+                    {
+                        "type": "text",
+                        "text": f"""Match these {len(opportunities)} opportunities to an org. For each, score fit.
+Opportunities: {opps_compact}""",
+                        "cache_control": {"type": "ephemeral"}
+                    }
+                ],
+                messages=[{
+                    "role": "user",
+                    "content": f"""Org: {org['name']} ({org.get('type','')})
+Strengths: {', '.join(org.get('strengths',[])[:8])}
+Eligibility: {json.dumps(org.get('eligibility_constraints',{}))[:200]}
 
-    if "competitors" in org:
-        org_text += f"  Competes with: {', '.join(org['competitors'][:5])}\n"
+For EACH opportunity return JSON: rfp_number, title, priority (HIGH/MEDIUM/LOW/NOT ELIGIBLE), fit_score (1-10), eligibility_ok (true/false), eligibility_note, what_you_need, recommended_action (Apply as lead/Apply as partner/Find fiscal sponsor/Skip/Monitor).
+
+JSON ARRAY ONLY. No markdown."""
+                }],
+            )
+            break
+        except Exception as e:
+            if "rate_limit" in str(e) or "429" in str(e):
+                wait = 60 * (attempt + 1)
+                print(f"    Rate limited — waiting {wait}s ({attempt+1}/3)...")
+                time.sleep(wait)
+                if attempt == 2:
+                    print(f"    Matching failed after retries")
+                    return opportunities
+            else:
+                print(f"    Error: {e}")
+                return opportunities
 
     try:
-        response = client.messages.create(
-            model=MODEL,
-            max_tokens=4000,
-            system=[
-                {
-                    "type": "text",
-                    "text": f"""You are an opportunity matching engine. Below are {len(opportunities)} specific funding opportunities.
-For each opportunity, assess its fit for the organization described, considering:
-1. Strength alignment (does the org have the right skills?)
-2. Eligibility (can the org actually apply? Flag issues.)
-3. Funding fit (is the amount in the org's range?)
-4. What the org needs to compete (specific partners, expertise, or fiscal sponsors needed)
-5. Priority score: HIGH / MEDIUM / LOW / NOT ELIGIBLE
-
-The full opportunity pool:
-{opps_json}""",
-                    "cache_control": {"type": "ephemeral"}
-                }
-            ],
-            messages=[{
-                "role": "user",
-                "content": f"""Analyze each opportunity for this organization:
-
-{org_text}
-
-For EACH opportunity, return a JSON object with:
-- rfp_number (from original)
-- title (from original)
-- priority: "HIGH" / "MEDIUM" / "LOW" / "NOT ELIGIBLE"
-- fit_score: 1-10 (10 = perfect fit)
-- eligibility_ok: true/false
-- eligibility_note: why or why not
-- what_you_need: specific guidance for this org
-- recommended_action: "Apply as lead" / "Apply as partner" / "Apply as subcontractor" / "Find fiscal sponsor" / "Skip — poor fit" / "Monitor for next cycle"
-
-RESPOND WITH ONLY A JSON ARRAY. No markdown, no backticks."""
-            }],
-        )
-
         text_parts = [b.text for b in response.content if hasattr(b, "text")]
         full_text = "\n".join(text_parts)
 
@@ -520,9 +483,13 @@ def run_scan(wave_filter=None, org_filter=None):
     # Phase 1: Scan all waves
     print(f"\n[Phase 1] Scanning {len(waves)} waves...")
     all_opportunities = []
-    for wave in waves:
+    for i, wave in enumerate(waves):
         results = scan_wave(client, wave)
         all_opportunities.extend(results)
+        # Wait between waves to respect rate limits (30K tokens/min)
+        if i < len(waves) - 1:
+            print(f"    Waiting 65s before next wave (rate limit cooldown)...")
+            time.sleep(65)
 
     # Deduplicate by RFP number
     seen = set()
@@ -541,6 +508,8 @@ def run_scan(wave_filter=None, org_filter=None):
         return
 
     # Phase 2: Match to each org (with prompt caching)
+    print(f"\n  Waiting 65s before org matching (rate limit cooldown)...")
+    time.sleep(65)
     print(f"\n[Phase 2] Matching to {len(orgs)} organization(s)...")
     for org in orgs:
         matched = match_opportunities_to_org(client, all_opportunities.copy(), org)
